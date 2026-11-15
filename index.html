@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFDF8">
+<title>Orderly</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --brand:#FFC83D;--brand-dark:#F2B705;--brand-weak:#FFF3CF;--brand-text:#8A5A00;
+  --ink:#2B241C;--sub:#5F564A;--ter:#776D60;--line:#ECE3D2;--bg:#F7F1E5;--surface:#FFFDF8;--beige:#F3E9D6;
+  --danger:#C62F28;--ok:#2F7A3B;--hot:#A63A0A;--hot-weak:#FDEBDD;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+html.large{font-size:19px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;word-break:keep-all}
+body.locked{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--brand-text);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.app{max-width:480px;margin:0 auto;min-height:100dvh;background:var(--surface);display:flex;flex-direction:column;position:relative}
+@media(min-width:560px){.app{box-shadow:0 0 0 1px var(--line)}}
+#view{flex:1;display:flex;flex-direction:column}
+h1:focus,h2:focus{outline:none}
+
+/* 공통 버튼 */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;width:100%;border-radius:14px;font-size:1.0625rem;font-weight:700;padding:0 20px}
+.btn-primary{background:var(--brand);color:var(--ink)}
+.btn-primary:active{background:var(--brand-dark)}
+.btn-primary:disabled{background:#E9E1D1;color:#8C8273}
+.btn-secondary{background:var(--bg);color:var(--ink)}
+.btn-sm{min-height:44px;width:auto;font-size:.9375rem;border-radius:12px;padding:0 16px}
+.icon-btn{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:var(--sub);flex:none}
+.icon-btn:active{background:var(--bg)}
+.ic{display:inline-flex;line-height:0}
+.ic svg{width:24px;height:24px}
+
+/* 손님 홈 */
+.store-head{padding:20px 12px 8px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.store-head h1{margin:0;font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.table-no{margin:2px 0 0;color:var(--sub);font-size:.9375rem}
+.order-banner{margin:0 20px 16px;display:flex;align-items:center;gap:12px;width:calc(100% - 40px);min-height:56px;padding:12px 16px;border-radius:14px;background:var(--brand-weak);color:var(--brand-text);font-weight:600;text-align:left}
+.order-banner span{flex:1}
+.tabs{position:sticky;top:0;z-index:5;background:var(--surface);display:flex;gap:4px;overflow-x:auto;padding:0 12px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;min-height:52px;padding:0 12px;font-size:1rem;font-weight:600;color:var(--ter);border-bottom:2px solid transparent}
+.tab[aria-current="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.menu-section{scroll-margin-top:52px}
+.menu-section h2{margin:0;padding:24px 20px 4px;font-size:1.125rem;font-weight:700}
+.menu-list{list-style:none;margin:0;padding:0}
+.menu-row{width:100%;display:flex;gap:16px;align-items:flex-start;padding:16px 20px;border-bottom:1px solid var(--line);text-align:left}
+.menu-list li:last-child .menu-row{border-bottom:0}
+.menu-row:active{background:var(--bg)}
+.menu-row .info{flex:1;min-width:0}
+.menu-row .name{margin:0;font-size:1.0625rem;font-weight:600;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.menu-row .desc{margin:4px 0 0;color:var(--sub);font-size:.875rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.menu-row .price{margin:8px 0 0;font-weight:700}
+.menu-row.soldout .name,.menu-row.soldout .price{color:var(--ter)}
+.menu-row.soldout .thumb{opacity:.5}
+.thumb{width:88px;height:88px;flex:none;border-radius:12px;background:var(--beige);display:grid;place-items:center;color:#A8936F}
+.thumb .ic svg{width:34px;height:34px}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:6px;font-size:.75rem;font-weight:600}
+.badge.hot{background:var(--hot-weak);color:var(--hot)}
+.badge.best{background:var(--brand-weak);color:var(--brand-text)}
+.badge.out{background:var(--bg);color:var(--sub)}
+.foot{margin-top:24px;padding:24px 20px 230px;background:var(--bg);color:var(--sub);font-size:.875rem}
+.foot p{margin:0 0 12px}
+.foot .row{display:flex;gap:8px;margin-bottom:20px}
+.foot .brand{color:var(--ter);font-size:.8125rem;display:flex;justify-content:space-between;align-items:center}
+.foot .brand b{font-weight:800;letter-spacing:-.02em;color:var(--sub)}
+.foot .brand a{color:var(--ter);text-decoration:underline;padding:8px 0}
+.bottom-bar{position:sticky;bottom:0;z-index:6;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--surface) 75%,rgba(255,253,248,0))}
+.cart-btn{justify-content:space-between}
+.cart-btn .l{display:flex;align-items:center;gap:8px}
+.count{min-width:24px;height:24px;border-radius:12px;background:var(--ink);color:var(--brand);font-size:.8125rem;font-weight:800;display:inline-grid;place-items:center;padding:0 7px}
+
+/* 하위 화면 헤더 */
+.page-head{position:sticky;top:0;z-index:7;background:var(--surface);min-height:56px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--line)}
+.page-head h1{margin:0;font-size:1.0625rem;font-weight:700;flex:1}
+.page-head .sub{display:block;font-size:.8125rem;font-weight:500;color:var(--ter)}
+
+/* 챗봇 */
+.chat{flex:1;display:flex;flex-direction:column;min-height:0}
+.chat-log{flex:1;padding:20px 16px 12px;display:flex;flex-direction:column;gap:16px}
+.msg{max-width:88%}
+.msg.user{align-self:flex-end;background:var(--brand);color:var(--ink);padding:10px 14px;border-radius:18px 18px 4px 18px}
+.msg.bot{align-self:flex-start;width:88%}
+.msg.bot .text{background:var(--bg);padding:12px 14px;border-radius:4px 18px 18px 18px;white-space:pre-line}
+.cards{margin-top:8px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.card-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
+.card-row:first-child{border-top:0}
+.card-row .t{flex:1;min-width:0}
+.card-row .num{width:26px;height:26px;border-radius:50%;background:var(--brand-weak);color:var(--brand-text);font-weight:800;font-size:.8125rem;display:grid;place-items:center;flex:none}
+.card-row .t b{display:block;font-weight:600}
+.card-row .t small{display:block;color:var(--sub);font-size:.875rem}
+.add-btn{min-height:44px;padding:0 14px;border-radius:10px;background:var(--brand-weak);color:var(--brand-text);font-weight:700;font-size:.9375rem;flex:none}
+.add-btn:disabled{background:var(--bg);color:var(--ter)}
+.acts{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.replay{margin-top:2px;color:var(--ter);font-size:.8125rem;min-height:36px;display:inline-flex;align-items:center;gap:4px;padding:0 4px}
+.replay .ic svg{width:18px;height:18px}
+.typing{align-self:flex-start;background:var(--bg);border-radius:4px 18px 18px 18px;padding:12px 16px;color:var(--ter);font-size:.9375rem}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:8px 16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);font-size:.9375rem;color:var(--sub);background:#fff}
+.chip:active{background:var(--bg)}
+.composer{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px 12px calc(10px + env(safe-area-inset-bottom))}
+.cart-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 4px 8px;font-size:.9375rem;color:var(--sub)}
+.cart-strip b{color:var(--ink)}
+.cart-strip button{min-height:40px;padding:0 12px;border-radius:10px;background:var(--brand-weak);color:var(--brand-text);font-weight:700;font-size:.875rem}
+.input-row{display:flex;gap:8px;align-items:center}
+.input-row input{flex:1;min-width:0;height:52px;border-radius:14px;border:1px solid var(--line);background:var(--bg);padding:0 16px;font-size:1rem}
+.input-row input:focus{background:#fff;border-color:var(--brand-text)}
+.mic,.send{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;flex:none}
+.mic{background:var(--bg);color:var(--ink)}
+.mic[aria-pressed="true"]{background:var(--danger);color:#fff}
+.send{background:var(--brand);color:var(--ink)}
+
+/* 장바구니·주문 상태 */
+.pad{padding:20px}
+.table-chip{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:8px;background:var(--bg);color:var(--sub);font-size:.875rem;font-weight:600}
+.cart-list{list-style:none;margin:16px 0 0;padding:0}
+.cart-item{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.cart-item .t{flex:1;min-width:0}
+.cart-item .t b{display:block;font-weight:600}
+.cart-item .t span{color:var(--sub);font-size:.9375rem}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:12px;flex:none}
+.stepper button{width:44px;height:44px;display:grid;place-items:center;color:var(--ink)}
+.stepper button .ic svg{width:20px;height:20px}
+.stepper output{min-width:32px;text-align:center;font-weight:700}
+.sum{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:1.125rem;font-weight:700}
+.notice{background:var(--bg);border-radius:12px;padding:14px 16px;color:var(--sub);font-size:.9375rem;margin:0}
+.empty{padding:64px 20px;text-align:center;color:var(--sub)}
+.empty b{display:block;color:var(--ink);font-size:1.125rem;margin-bottom:4px}
+.status-hero{text-align:center;padding:40px 20px 24px}
+.status-hero .mark{width:64px;height:64px;border-radius:50%;background:var(--brand-weak);color:var(--brand-text);display:grid;place-items:center;margin:0 auto 16px}
+.status-hero .mark .ic svg{width:32px;height:32px}
+.status-hero h1{margin:0;font-size:1.375rem}
+.status-hero p{margin:6px 0 0;color:var(--sub)}
+.status-hero .order-no{font-size:2.5rem;font-weight:800;letter-spacing:-.02em;margin:16px 0 0;color:var(--ink)}
+.steps{list-style:none;display:flex;margin:8px 20px 24px;padding:0}
+.steps li{flex:1;text-align:center;font-size:.875rem;color:var(--ter);position:relative;padding-top:22px}
+.steps li::before{content:"";position:absolute;top:4px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--line);z-index:1}
+.steps li::after{content:"";position:absolute;top:9px;left:-50%;width:100%;height:2px;background:var(--line)}
+.steps li:first-child::after{display:none}
+.steps li.on{color:var(--ink);font-weight:700}
+.steps li.on::before,.steps li.on::after{background:var(--brand)}
+.receipt{border:1px solid var(--line);border-radius:14px;padding:4px 16px;margin:0 20px}
+.receipt .r{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}
+.receipt .r:last-child{border-bottom:0;font-weight:700}
+.stack{display:grid;gap:8px;padding:20px}
+
+/* 시트 */
+#sheetRoot{position:fixed;inset:0;z-index:50;pointer-events:none}
+#sheetRoot:empty{display:none}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;max-height:90dvh;overflow-y:auto;background:var(--surface);border-radius:20px 20px 0 0;padding:8px 20px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .22s ease;pointer-events:auto}
+#sheetRoot.open .backdrop{opacity:1}
+#sheetRoot.open .sheet{transform:none}
+.grabber{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px}
+.sheet h2{margin:0;font-size:1.375rem;letter-spacing:-.01em}
+.sheet .lead{margin:6px 0 0;color:var(--sub)}
+.sheet .price-big{margin:12px 0 0;font-size:1.25rem;font-weight:700}
+.meta{margin:20px 0 0;border-top:1px solid var(--line)}
+.meta div{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.meta dt{width:84px;flex:none;color:var(--ter)}
+.meta dd{margin:0;flex:1}
+.sheet-actions{display:flex;align-items:center;gap:12px;margin-top:20px}
+.sheet-foot{display:grid;gap:8px;margin-top:16px}
+.choice{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;text-align:left;margin-top:10px}
+.choice:active{background:var(--bg)}
+.choice .ic{width:44px;height:44px;border-radius:12px;background:var(--brand-weak);color:var(--brand-text);display:grid;place-items:center;flex:none}
+.choice b{display:block;font-size:1.0625rem}
+.choice small{display:block;color:var(--sub);font-size:.875rem}
+.setting{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.setting b{display:block}
+.setting small{display:block;color:var(--sub);font-size:.875rem}
+.switch{width:52px;height:32px;border-radius:16px;background:#D6CCBA;position:relative;flex:none;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--brand-dark)}
+.switch[aria-checked="true"]::after{transform:translateX(20px)}
+
+/* 관리자 */
+.admin-head{padding:16px 12px 12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:7}
+.wordmark{font-weight:800;font-size:1.25rem;letter-spacing:-.03em;color:var(--ink)}
+.admin-head small{display:block;color:var(--sub);font-size:.875rem}
+.seg{display:flex;margin:16px 20px 0;background:var(--bg);border-radius:12px;padding:4px}
+.seg button{flex:1;min-height:44px;border-radius:9px;font-weight:600;color:var(--sub)}
+.seg button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.admin-body{padding:16px 20px 40px}
+.order-card{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.order-card.staff{border-color:#F5C2A8;background:var(--hot-weak)}
+.order-card .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.order-card .top b{font-size:1.0625rem}
+.order-card .top time{color:var(--ter);font-size:.875rem}
+.order-card ul{list-style:none;margin:10px 0;padding:0;color:var(--sub)}
+.order-card .bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;font-size:.8125rem;font-weight:700;background:var(--bg);color:var(--sub)}
+.pill.received{background:var(--hot-weak);color:var(--hot)}
+.pill.preparing{background:var(--brand-weak);color:var(--brand-text)}
+.pill.done{background:#E7F6EE;color:var(--ok)}
+.sec-title{font-size:.9375rem;color:var(--ter);font-weight:600;margin:24px 0 8px}
+.admin-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.admin-row .t{flex:1;min-width:0}
+.admin-row .t b{display:block;font-weight:600}
+.admin-row .t small{color:var(--sub);font-size:.875rem}
+.link-btn{min-height:44px;padding:0 10px;color:var(--brand-text);font-weight:600}
+.field{display:block;margin-top:16px}
+.field>span{display:block;font-size:.9375rem;font-weight:600;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;padding:0 14px;background:#fff;font-size:1rem}
+.field textarea{padding:12px 14px;min-height:88px;resize:vertical}
+.picks{display:flex;flex-wrap:wrap;gap:8px}
+.pick{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line);font-size:.9375rem}
+.pick[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;margin-top:8px}
+.check input{width:20px;height:20px;accent-color:var(--brand)}
+.hint{font-size:.875rem;color:var(--sub);margin:6px 0 0}
+.danger-link{color:var(--danger);font-weight:600;min-height:44px}
+
+
+/* 챗봇 런처 (화면 오른쪽 아래) */
+.bot-launcher{position:fixed;right:max(16px,calc((100vw - 480px)/2 + 16px));bottom:calc(20px + env(safe-area-inset-bottom));z-index:20;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:none;transition:bottom .2s}
+.bot-launcher>*{pointer-events:auto}
+.bot-launcher.lift{bottom:calc(92px + env(safe-area-inset-bottom))}
+.bot-hint{position:relative;display:flex;align-items:center;gap:2px;background:#FFF8E6;border:2px solid var(--brand);border-radius:22px;box-shadow:0 10px 26px rgba(120,80,0,.16);padding:8px 6px 8px 10px;max-width:min(320px,calc(100vw - 32px));margin-bottom:6px;transform-origin:calc(100% - 46px) calc(100% + 12px);animation:hintIn .35s cubic-bezier(.2,.9,.3,1.3) both}
+.bot-hint::after{content:"";position:absolute;right:36px;bottom:-9px;width:16px;height:16px;background:#FFF8E6;border-right:2px solid var(--brand);border-bottom:2px solid var(--brand);border-bottom-right-radius:4px;transform:rotate(45deg)}
+.bot-hint .open{display:flex;align-items:center;gap:10px;min-height:52px;text-align:left;padding-right:4px}
+.bot-hint .face{width:46px;height:46px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 2px var(--brand)}
+.bot-hint .face img{width:100%;height:100%;display:block}
+.bot-hint .tag{display:inline-block;font-size:.6875rem;font-weight:800;letter-spacing:.02em;background:var(--brand);color:var(--ink);border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:2px}
+.bot-hint b{display:block;font-size:1rem;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+.bot-hint small{display:block;font-size:.8125rem;color:var(--sub);line-height:1.35;margin-top:1px}
+.bot-hint .x{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--sub);flex:none;align-self:flex-start}
+.bot-hint .x:active{background:#F5E7C4}
+.bot-hint .x .ic svg{width:18px;height:18px}
+@keyframes hintIn{from{opacity:0;transform:scale(.85) translateY(8px)}to{opacity:1;transform:none}}
+.bot-fab{width:96px;height:96px;border-radius:50%;background:#FFF8E6;border:3px solid var(--brand);box-shadow:0 8px 22px rgba(80,55,10,.22);overflow:hidden;display:grid;place-items:center;padding:10px}
+.bot-fab:active{transform:scale(.96)}
+.bot-fab img{width:100%;height:auto;display:block}
+.head-logo{height:30px;width:auto;display:block}
+.foot-logo{height:22px;width:auto;display:block}
+.admin-logo{height:32px;width:auto;display:block;margin-bottom:2px}
+.av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--brand);background:#fff;flex:none}
+.av img,.av svg{width:100%;height:100%;object-fit:cover;display:block}
+.msg.bot .who{display:flex;align-items:center;gap:8px;font-size:.875rem;color:var(--ink);font-weight:700;margin:0 0 6px}
+.page-head .av{margin-right:8px}
+
+
+/* 관리자 번호 입력 */
+.lock{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 24px calc(24px + env(safe-area-inset-bottom));background:var(--surface)}
+.lock-top{width:100%;display:flex;justify-content:flex-start}
+.lock-logo{height:44px;width:auto;margin:28px 0 20px}
+.lock h1{margin:0;font-size:1.375rem;letter-spacing:-.01em}
+.lock .lead{margin:6px 0 0;color:var(--sub);text-align:center}
+.dots{display:flex;gap:16px;margin:32px 0 12px}
+.dots span{width:16px;height:16px;border-radius:50%;border:2px solid #D6C9AE;background:transparent;transition:background .15s,border-color .15s}
+.dots span.on{background:var(--ink);border-color:var(--ink)}
+.dots.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.lock-msg{min-height:24px;color:var(--danger);font-size:.9375rem;font-weight:600;text-align:center}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:320px;margin-top:auto;padding-top:24px}
+.keypad button{height:64px;border-radius:16px;text-align:center;background:#F7F0E1;font-size:1.5rem;font-weight:700;color:var(--ink)}
+.keypad button:active{background:var(--brand)}
+.keypad button.fn{background:transparent;font-size:1rem;font-weight:600;color:var(--sub)}
+.keypad button:disabled{opacity:.4}
+.lock-note{margin:16px 0 0;font-size:.8125rem;color:var(--ter);text-align:center}
+
+/* 토스트 */
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,8px);z-index:60;background:rgba(43,36,28,.94);color:#fff;padding:12px 16px;border-radius:12px;font-size:.9375rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 40px);width:max-content;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app"><div id="view"></div></div>
+<div id="sheetRoot"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   Orderly 손님 메뉴·챗봇 / 매장 관리 (시연용 단일 파일)
+
+   실제 배포 구조
+   - NFC 태그 URL: https://도메인/?store=매장ID&table=테이블번호
+   - 메뉴·주문은 서버 DB에 저장하고, 이 페이지는 API로 불러온다.
+   - 시연 버전은 메뉴·주문을 이 브라우저(localStorage)에 저장한다.
+     같은 브라우저의 다른 탭에서 #/admin 을 열면 손님 주문이 실시간으로 보인다.
+   ========================================================= */
+
+/* ---------- 설정 ---------- */
+const STORE = { id: 'orderly', name: 'Orderly' };
+const params = new URLSearchParams(location.search);
+const TABLE = (params.get('table') || '3').replace(/[^0-9A-Za-z-]/g, '').slice(0, 6) || '3';
+// AI 챗봇 서버 주소. 비워 두면 브라우저 안의 규칙 엔진만으로 답한다.
+// 예: '/api/chat' (server.js 실행 시)
+const CHAT_ENDPOINT = params.get('ai') === 'on' ? '/api/chat' : '';
+
+// 챗봇 이름과 캐릭터(로고) 이미지. 로고 파일이 생기면 LOGO_SRC에 경로를 넣는다. 예: 'logo.png'
+const BOT_NAME = '오더리';
+// 매장 관리자 번호 (시연용). 실서비스에서는 서버에서 매장 계정으로 로그인한다.
+const ADMIN_PIN = '1234';
+const LOGO_SRC = 'data:image/webp;base64,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';
+
+const CATEGORIES = ['카페인', '디카페인', '논커피', '주스/티', '디저트'];
+const ALLERGENS = ['우유','달걀','밀','대두','땅콩','호두','잣','메밀','토마토','복숭아','돼지고기','쇠고기','닭고기','새우','게','조개류','오징어','고등어','아황산류'];
+// 손님이 말하는 표현 → 등록된 알레르기 성분
+const ALLERGEN_WORDS = {
+  '우유': /우유|유제품|유당|밀크/, '달걀': /달걀|계란|에그|난류/, '밀': /밀가루|글루텐|(^|[^비메])밀(?!크)/,
+  '대두': /대두|(^|[^땅])콩/, '땅콩': /땅콩|피넛/, '호두': /호두/, '잣': /(^|\s)잣/, '메밀': /메밀/,
+  '토마토': /토마토/, '복숭아': /복숭아/, '돼지고기': /돼지|베이컨|햄(?!버)/, '쇠고기': /쇠고기|소고기/,
+  '닭고기': /닭|치킨/, '새우': /새우/, '게': /꽃게|게살|대게|(^|\s)게(?=$|가|는|를|살|\s*(들어|넣|성분|알레르기|알러지|없|빼))/, '조개류': /조개|홍합|전복|(^|\s)굴/,
+  '오징어': /오징어/, '고등어': /고등어/, '아황산류': /아황산/
+};
+
+/* allergens: [] = 확인 결과 알레르기 성분 없음, null = 아직 등록 안 됨
+   caffeine: 카페인이 들어 있으면 true (디카페인은 false로 두고 설명에 안내) */
+const DEFAULT_MENUS = [
+  // 카페인
+  { id:'m1', name:'아메리카노', category:'카페인', price:4500, desc:'고소한 원두로 내린 기본 커피예요. 따뜻하게 또는 차갑게 고를 수 있어요.', caffeine:true, popular:true, soldOut:false, allergens:[], aliases:['아아','아메'] },
+  { id:'m2', name:'카페라떼', category:'카페인', price:5000, desc:'에스프레소에 우유를 더한 부드러운 커피예요.', caffeine:true, popular:false, soldOut:false, allergens:['우유'], aliases:['카페 라떼'] },
+  { id:'m3', name:'바닐라 라떼', category:'카페인', price:5500, desc:'카페라떼에 바닐라 시럽을 넣어 달콤해요.', caffeine:true, popular:true, soldOut:false, allergens:['우유'], aliases:[] },
+  { id:'m4', name:'콜드브루', category:'카페인', price:5000, desc:'찬물로 오래 우려 쓴맛이 적고 깔끔해요. 차갑게만 나가요.', caffeine:true, popular:false, soldOut:false, allergens:[], aliases:['콜드 브루'] },
+  // 디카페인
+  { id:'m5', name:'디카페인 아메리카노', category:'디카페인', price:5000, desc:'카페인을 대부분 걷어낸 원두로 내린 아메리카노예요. 카페인이 아주 조금 남아 있을 수 있어요.', caffeine:false, popular:true, soldOut:false, allergens:[], aliases:['디카페인 아아','디카 아메리카노'] },
+  { id:'m6', name:'디카페인 카페라떼', category:'디카페인', price:5500, desc:'디카페인 에스프레소에 우유를 더했어요.', caffeine:false, popular:false, soldOut:false, allergens:['우유'], aliases:['디카페인 라떼'] },
+  { id:'m7', name:'디카페인 바닐라 라떼', category:'디카페인', price:6000, desc:'디카페인 라떼에 바닐라 시럽을 넣어 달콤해요.', caffeine:false, popular:false, soldOut:false, allergens:['우유'], aliases:[] },
+  // 논커피
+  { id:'m8', name:'초코 라떼', category:'논커피', price:5500, desc:'진한 초콜릿 소스와 우유로 만든 달콤한 음료예요.', caffeine:false, popular:true, soldOut:false, allergens:['우유','대두'], aliases:['초코라떼','핫초코'] },
+  { id:'m9', name:'고구마 라떼', category:'논커피', price:5500, desc:'구운 고구마를 갈아 우유와 섞은 고소한 음료예요.', caffeine:false, popular:false, soldOut:false, allergens:['우유'], aliases:['고구마라떼'] },
+  { id:'m10', name:'딸기 라떼', category:'논커피', price:6000, desc:'딸기청과 우유를 섞은 달콤한 음료예요.', caffeine:false, popular:false, soldOut:true, allergens:['우유'], aliases:['딸기라떼'] },
+  // 주스/티
+  { id:'m11', name:'오렌지 주스', category:'주스/티', price:5500, desc:'오렌지를 그대로 짜낸 주스예요.', caffeine:false, popular:false, soldOut:false, allergens:[], aliases:['오렌지쥬스'] },
+  { id:'m12', name:'레몬 에이드', category:'주스/티', price:5500, desc:'직접 담근 레몬청에 탄산수를 넣은 상큼한 음료예요.', caffeine:false, popular:true, soldOut:false, allergens:[], aliases:['레몬에이드'] },
+  { id:'m13', name:'캐모마일 티', category:'주스/티', price:4800, desc:'은은한 꽃향의 따뜻한 허브차예요.', caffeine:false, popular:false, soldOut:false, allergens:null, aliases:['캐모마일'] },
+  { id:'m14', name:'얼그레이 티', category:'주스/티', price:4800, desc:'베르가못 향이 나는 홍차예요.', caffeine:true, popular:false, soldOut:false, allergens:[], aliases:['얼그레이'] },
+  // 디저트
+  { id:'m15', name:'버터 크로플', category:'디저트', price:4500, desc:'버터를 넣어 구운 바삭한 크루아상 와플이에요.', caffeine:false, popular:true, soldOut:false, allergens:['밀','우유','달걀'], aliases:['크로플'] },
+  { id:'m16', name:'바스크 치즈케이크', category:'디저트', price:6500, desc:'겉은 진하게 굽고 속은 촉촉한 치즈케이크예요.', caffeine:false, popular:false, soldOut:false, allergens:['우유','달걀','밀'], aliases:['치즈케이크','치즈 케이크'] },
+  { id:'m17', name:'초코칩 쿠키', category:'디저트', price:3500, desc:'초코칩을 듬뿍 넣어 구운 쫀득한 쿠키예요.', caffeine:false, popular:false, soldOut:false, allergens:['밀','우유','달걀','대두'], aliases:['쿠키','초코 쿠키'] }
+];
+
+/* ---------- 저장소 ---------- */
+const KEY = {
+  menu: `orderly.${STORE.id}.menu.v2`, orders: `orderly.${STORE.id}.orders`, seq: `orderly.${STORE.id}.seq`,
+  prefs: 'orderly.prefs', adminOk: `orderly.${STORE.id}.adminOk`, lockUntil: `orderly.${STORE.id}.lockUntil`, cart: `orderly.${STORE.id}.t${TABLE}.cart`, mine: `orderly.${STORE.id}.t${TABLE}.mine`
+};
+const local = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const session = {
+  get(k, d) { try { const v = sessionStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const clone = o => JSON.parse(JSON.stringify(o));
+function loadMenus() { const m = local.get(KEY.menu, null); return Array.isArray(m) && m.length ? m : clone(DEFAULT_MENUS); }
+function saveMenus() { local.set(KEY.menu, menus); }
+function loadOrders() { return local.get(KEY.orders, []); }
+function saveOrders(o) { local.set(KEY.orders, o); }
+
+let menus = loadMenus();
+let cart = session.get(KEY.cart, []);
+let prefs = Object.assign({ voice:false, voiceReply:true, large:false, chosen:false }, local.get(KEY.prefs, {}));
+let chat = [];               // 챗봇 대화 기록
+let pendingConfirm = false;  // "주문 확정"을 기다리는 중인지
+let lastPool = [], lastShown = 0; // "더 보여줘" 용
+// 대화 맥락: 직전에 보여준 후보 목록, 마지막으로 말한 메뉴, 되묻는 중인 질문
+let lastList = [], lastMenu = null, pendingClarify = null, refHintShown = false;
+let adminTab = 'orders';
+
+/* ---------- 유틸 ---------- */
+const $ = s => document.querySelector(s);
+const won = n => n.toLocaleString('ko-KR') + '원';
+const getMenu = id => menus.find(m => m.id === id);
+const available = () => menus.filter(m => !m.soldOut);
+const fmtTime = t => new Date(t).toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' });
+function josa(word, a, b) { const c = word.charCodeAt(word.length - 1); if (c < 0xAC00 || c > 0xD7A3) return word + b; return word + ((c - 0xAC00) % 28 ? a : b); }
+function allergenText(m) {
+  if (m.allergens === null || m.allergens === undefined) return '아직 등록되지 않았어요. 직원에게 확인해 주세요.';
+  if (!m.allergens.length) return '등록된 알레르기 유발 성분이 없어요.';
+  return m.allergens.join(', ');
+}
+
+const ICONS = {
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  settings:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  chat:'<path d="M20 11.5a7.5 7.5 0 0 1-10.9 6.7L4 19.5l1.3-4.6A7.5 7.5 0 1 1 20 11.5z"/><path d="M9 11.5h.01M12.5 11.5h.01M16 11.5h.01" stroke-width="2.6"/>',
+  mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+  send:'<path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/>',
+  speaker:'<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+  eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 1.5h-15L6 16z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>',
+  chevron:'<path d="M9 5l7 7-7 7"/>',
+  cup:'<path d="M5 8h11v5.5A5.5 5.5 0 0 1 10.5 19h0A5.5 5.5 0 0 1 5 13.5V8z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5v2M11.5 3.5v2"/>',
+  glass:'<path d="M6 7h12l-1.6 13H7.6L6 7z"/><path d="M13 7l2.2-4H18"/>',
+  cake:'<path d="M4 20h16M5.5 20v-7h13v7M5.5 13c2.2 1.6 4.3 1.6 6.5 0s4.3-1.6 6.5 0M12 7.5V10"/><path d="M12 4.5v.5" stroke-width="2.4"/>',
+  mug:'<path d="M6 6h10v11a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V6z"/><path d="M16 9h1.5a2.5 2.5 0 0 1 0 5H16M6 10h10"/>'
+};
+const CAT_ICON = { '카페인':'cup', '디카페인':'cup', '논커피':'mug', '주스/티':'glass', '디저트':'cake' };
+function icon(name) {
+  const s = document.createElement('span'); s.className = 'ic'; s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+  return s;
+}
+function logoImg(cls) { return h('img', { src:LOGO_SRC, alt:'Orderly', class:cls || null }); }
+// 챗봇 캐릭터 아이콘 (말풍선 카드, 챗봇 답변 옆에 쓰인다)
+const FACE_SRC = 'data:image/webp;base64,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';
+function mascot() { return h('img', { src:FACE_SRC, alt:'' }); }
+// DOM 생성 도우미 (사용자 입력은 항상 textContent로 들어가 XSS를 막는다)
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, '');
+    else el.setAttribute(k, v);
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c === null || c === undefined || c === false) continue;
+    el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return el;
+}
+
+/* ---------- 음성 ---------- */
+function speak(text, force) {
+  if (!force && !prefs.voice) return;
+  if (!('speechSynthesis' in window)) { if (force) toast('이 기기에서는 음성 읽기를 지원하지 않아요.'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = 1;
+  speechSynthesis.speak(u);
+}
+function stopSpeaking() { try { speechSynthesis.cancel(); } catch (e) {} }
+let recognizer = null;
+function stopListening() { if (recognizer) { try { recognizer.abort(); } catch (e) {} recognizer = null; } }
+// 음성 인식: 브라우저 내장 기능(Web Speech API) 사용
+// - Chrome(PC·안드로이드), Safari(아이폰)에서 동작. 인터넷 연결 필요.
+// - https 주소나 localhost에서 열어야 마이크를 쓸 수 있다. 파일을 더블클릭해 열면(file://) 막힐 수 있다.
+const MIC_ERRORS = {
+  'not-allowed': location.protocol === 'file:'
+    ? '파일을 직접 열면 마이크를 쓸 수 없어요. localhost나 https 주소로 열어 주세요.'
+    : '마이크 권한이 꺼져 있어요. 주소창 왼쪽의 설정에서 마이크를 허용해 주세요.',
+  'service-not-allowed': '이 브라우저에서는 음성 인식이 막혀 있어요. Chrome이나 Safari로 열어 주세요.',
+  'network': '음성 인식은 인터넷에 연결되어 있어야 해요.',
+  'audio-capture': '마이크를 찾을 수 없어요. 마이크 연결을 확인해 주세요.',
+  'no-speech': '말소리가 들리지 않았어요. 마이크 버튼을 다시 누르고 말해 주세요.',
+  'language-not-supported': '이 기기에서는 한국어 음성 인식을 지원하지 않아요.'
+};
+function toggleMic(btn) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('이 브라우저에서는 음성 인식을 쓸 수 없어요. Chrome이나 Safari로 열거나 글자로 입력해 주세요.', true); $('#q')?.focus(); return; }
+  if (!window.isSecureContext) { toast('음성 인식은 https 주소나 localhost에서만 동작해요.', true); return; }
+  if (recognizer) { recognizer.stop(); return; }
+  stopSpeaking();
+  recognizer = new SR(); recognizer.lang = 'ko-KR'; recognizer.interimResults = false; recognizer.maxAlternatives = 1;
+  btn.setAttribute('aria-pressed', 'true'); btn.setAttribute('aria-label', '듣는 중이에요. 누르면 멈춰요');
+  recognizer.onstart = () => toast('듣고 있어요. 말씀해 주세요.');
+  recognizer.onresult = e => send(e.results[0][0].transcript, true);
+  recognizer.onerror = e => {
+    if (e.error === 'aborted') return;
+    toast(MIC_ERRORS[e.error] || `음성 인식 오류(${e.error})가 났어요. 다시 시도하거나 글자로 입력해 주세요.`, true);
+  };
+  recognizer.onend = () => { recognizer = null; btn.setAttribute('aria-pressed', 'false'); btn.setAttribute('aria-label', '말로 질문하기'); };
+  try { recognizer.start(); } catch (e) { recognizer = null; btn.setAttribute('aria-pressed', 'false'); toast('음성 인식을 시작하지 못했어요. 잠시 후 다시 눌러 주세요.', true); }
+}
+
+/* ---------- 토스트 / 시트 ---------- */
+function toast(msg, say) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('show'), 2400);
+  if (say) speak(msg);
+}
+let sheetReturnFocus = null;
+function openSheet(label, ...content) {
+  closeSheet(true);
+  sheetReturnFocus = document.activeElement;
+  const root = $('#sheetRoot');
+  const panel = h('div', { class:'sheet', role:'dialog', 'aria-modal':'true', 'aria-label':label, tabindex:'-1' }, h('div', { class:'grabber', 'aria-hidden':'true' }), content);
+  root.replaceChildren(h('div', { class:'backdrop', onclick:() => closeSheet() }), panel);
+  $('#app').inert = true; document.body.classList.add('locked');
+  requestAnimationFrame(() => { root.classList.add('open'); panel.focus(); });
+}
+function closeSheet(instant) {
+  const root = $('#sheetRoot'); if (!root.children.length) return;
+  root.classList.remove('open'); $('#app').inert = false; document.body.classList.remove('locked');
+  if (instant) root.replaceChildren(); else setTimeout(() => { if (!root.classList.contains('open')) root.replaceChildren(); }, 220);
+  if (sheetReturnFocus && document.contains(sheetReturnFocus)) sheetReturnFocus.focus();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+/* ---------- 장바구니 ---------- */
+function saveCart() { session.set(KEY.cart, cart); }
+function cartLines() { return cart.map(c => ({ m:getMenu(c.id), qty:c.qty })).filter(x => x.m && !x.m.soldOut); }
+function cartCount() { return cartLines().reduce((n, x) => n + x.qty, 0); }
+function cartTotal() { return cartLines().reduce((n, x) => n + x.m.price * x.qty, 0); }
+function addToCart(id, qty = 1) {
+  const m = getMenu(id);
+  if (!m || m.soldOut) { toast('지금은 주문할 수 없는 메뉴예요.', true); return false; }
+  const f = cart.find(c => c.id === id);
+  if (f) f.qty = Math.min(20, f.qty + qty); else cart.push({ id, qty });
+  saveCart(); refreshCartUI(); return true;
+}
+function setQty(id, qty) {
+  if (qty <= 0) cart = cart.filter(c => c.id !== id);
+  else { const f = cart.find(c => c.id === id); if (f) f.qty = Math.min(20, qty); }
+  saveCart(); refreshCartUI();
+}
+function cartSummaryText() {
+  const lines = cartLines();
+  return lines.map(x => `${x.m.name} ${x.qty}개`).join(', ') + `, 합계 ${won(cartTotal())}`;
+}
+function refreshCartUI() {
+  const bar = $('#cartBar'); if (bar) bar.replaceWith(renderCartBar());
+  const strip = $('#cartStrip'); if (strip) strip.replaceWith(renderCartStrip());
+  $('#botLauncher')?.classList.toggle('lift', currentRoute() === 'menu' && cartCount() > 0);
+}
+
+/* ---------- 주문 / 직원 호출 ---------- */
+function nextOrderNo() { const n = (local.get(KEY.seq, 100) || 100) + 1; local.set(KEY.seq, n); return n; }
+function placeOrder() {
+  const lines = cartLines();
+  if (!lines.length) { toast('담은 메뉴가 없어요.', true); return; }
+  const order = { id:'o' + Date.now(), no:nextOrderNo(), type:'order', table:TABLE,
+    items: lines.map(x => ({ id:x.m.id, name:x.m.name, price:x.m.price, qty:x.qty })),
+    total: cartTotal(), status:'received', at: Date.now() };
+  const orders = loadOrders(); orders.push(order); saveOrders(orders);
+  const mine = session.get(KEY.mine, []); mine.push(order.id); session.set(KEY.mine, mine);
+  cart = []; saveCart(); pendingConfirm = false;
+  go('#/order');
+  speak(`주문번호 ${order.no}번으로 주문을 전달했어요. 결제는 카운터에서 해 주세요.`);
+}
+function callStaff() {
+  const orders = loadOrders();
+  const recent = orders.find(o => o.type === 'staff' && o.table === TABLE && o.status !== 'done' && Date.now() - o.at < 3 * 60 * 1000);
+  if (recent) { toast('이미 직원을 불렀어요. 잠시만 기다려 주세요.', true); return; }
+  orders.push({ id:'s' + Date.now(), type:'staff', table:TABLE, status:'received', at:Date.now() });
+  saveOrders(orders);
+  toast('직원을 불렀어요. 잠시만 기다려 주세요.', true);
+}
+function myLatestOrder() {
+  const mine = session.get(KEY.mine, []); if (!mine.length) return null;
+  const orders = loadOrders();
+  for (let i = mine.length - 1; i >= 0; i--) { const o = orders.find(x => x.id === mine[i]); if (o) return o; }
+  return null;
+}
+const STATUS = { received:'접수됨', preparing:'준비 중', done:'완료' };
+
+/* =========================================================
+   챗봇
+   - 알레르기, 담기·빼기, 주문 확정, 직원 호출처럼 틀리면 안 되는 일은
+     아래 규칙 코드가 직접 처리한다 (AI가 추측하지 못하게).
+   - 그 밖의 자유 질문·추천은 AI 서버(CHAT_ENDPOINT)가 있으면 AI가,
+     없으면 규칙 엔진이 답한다.
+   ========================================================= */
+const RE = {
+  staff: /직원|사장님|사람\s*(좀|불)|호출|도와\s*주/,
+  staffNow: /불러|호출|와\s*주|오라고/,
+  confirm: /^(네|예|응|좋아|좋아요|그래|그래요|맞아|맞아요|확정)[\s.!]*$|주문\s*확정|확정(할|해)/,
+  cart: /장바구니|담은\s*(거|것|메뉴)|뭐\s*담|주문\s*(할게|할래|하기|해\s*줘|해\s*주세요|할\s*게요|확인|내역)|계산|결제/,
+  remove: /빼\s*줘|빼\s*주|빼기|취소|삭제|지워|하나\s*빼/,
+  add: /담아|담기|담을|추가|주세요|줘요|줄래|(^|\s)줘|걸로|거로|(으)?로\s*(할게|할래|줘|주세요)|주문|한\s*(개|잔)|\d+\s*(개|잔)|(두|세|네)\s*(개|잔)|하나/,
+  info: /얼마|가격|설명|어때|뭐야|뭔가요|무슨\s*맛|알려|어떤|들어가|들어간|재료|성분/,
+  // "들어있어요", "넣었어요", "포함돼요"처럼 성분을 묻는 말도 모두 잡는다 (server.js 의 ALLERGY_RE 와 함께 관리)
+  allergyWord: /알레르기|알러지|알르레기|성분|재료|들어\s*(가|간|갔|있|감)|들었|넣었|넣나|넣는지|넣어요\s*\?|포함|함유|뭐\s*들/,
+  // 특정 성분 이름과 함께 쓰면 '그 성분이 들어간 메뉴'를 찾는 말
+  containsWord: /들어\s*(가|간|갔|있|감)|들었|넣었|넣은|포함|함유|있는|있어|있나/,
+  negation: /알레르기|알러지|없는|없이|빼고|빠진|안\s*들어|못\s*먹|말고|제외|피해/,
+  listAll: /전체|모든\s*메뉴|메뉴판|뭐\s*(있|팔)|무슨\s*메뉴|메뉴\s*(알려|보여|뭐|있)|종류|어떤\s*(거|게|것|메뉴)\s*(있|팔)/,
+  hello: /^(안녕|하이|헬로|반가|처음)/,
+  more: /더\s*(보여|알려|있|없)|다른\s*(거|메뉴)|그\s*외/,
+  recommend: /추천|인기|많이\s*(찾|먹|팔)|뭐\s*(먹|마시)|뭐가\s*좋|맛있|골라/,
+  cheap: /저렴|싼|싸게|가성비|제일\s*싼/,
+  latte: /라떼/
+};
+const CAT_RE = [
+  ['디카페인', /디카페인|디카(?!페)/],
+  ['논커피', /논\s*커피|커피\s*(말고|빼고|없는|아닌|안\s*들어)/],
+  ['주스/티', /주스|쥬스|에이드|(^|\s)티|티(\s|$|\s*종류)|허브|홍차|(^|\s)차(\s|$|\s*종류)|과일|상큼/],
+  ['디저트', /디저트|케이크|빵|간식|후식|쿠키|크로플|달달한\s*(거|것)/],
+  ['카페인', /(^|[^디])카페인|커피|에스프레소|진한|잠\s*깨/]
+];
+// 카페인 없는 메뉴를 찾는 말 (이때는 '카페인' 분류로 오해하지 않는다)
+const NO_CAFFEINE = /카페인\s*(없|빼|적|싫|안\s*들|약)|무카페인|노\s*카페인|임산부|잠\s*(못|안\s*와|설쳐)/;
+function detectCategory(s) {
+  for (const [c, re] of CAT_RE) {
+    if (c === '카페인' && NO_CAFFEINE.test(s)) continue;
+    if (re.test(s)) return c;
+  }
+  return null;
+}
+function findMenuByName(s) {
+  const flat = s.replace(/\s/g, '');
+  let best = null, bestLen = 0;
+  for (const m of menus) {
+    for (const n of [m.name, ...(m.aliases || [])]) {
+      const k = n.replace(/\s/g, '');
+      if (k.length >= 2 && flat.includes(k) && k.length > bestLen) { best = m; bestLen = k.length; }
+    }
+  }
+  return best;
+}
+function mentionedAllergens(s) {
+  const found = new Set();
+  for (const [a, re] of Object.entries(ALLERGEN_WORDS)) if (re.test(s)) found.add(a);
+  if (/견과/.test(s)) ['땅콩', '호두', '잣'].forEach(a => found.add(a));
+  return [...found];
+}
+function parseQty(s) {
+  let m = s.match(/(\d+)\s*(개|잔|인분)/); if (m) return Math.max(1, Math.min(20, +m[1]));
+  m = s.match(/(한|두|세|네|다섯)\s*(개|잔)/); if (m) return { '한':1, '두':2, '세':3, '네':4, '다섯':5 }[m[1]];
+  if (/(^|\s)둘/.test(s)) return 2; if (/(^|\s)셋/.test(s)) return 3;
+  return 1;
+}
+// "6천 원", "1만 2천원", "5,500원", "육천원", "6000 이하" 모두 인식
+function parseBudget(s) {
+  const t = s.replace(/,/g, ''); let v = null, m;
+  if ((m = t.match(/(\d+(?:\.\d+)?)\s*만\s*(?:(\d)\s*천)?/))) v = parseFloat(m[1]) * 10000 + (m[2] ? +m[2] * 1000 : 0);
+  else if ((m = t.match(/(\d+(?:\.\d+)?)\s*천/))) v = parseFloat(m[1]) * 1000;
+  else if ((m = t.match(/(\d{3,6})\s*(원|이하|이상|까지|아래|미만|넘)/))) v = +m[1];
+  if (v === null) {
+    const K = '일이삼사오육칠팔구';
+    if ((m = t.match(/(?:([일이삼사오육칠팔구]?)만\s*)?([일이삼사오육칠팔구])천/))) {
+      v = (m[0].includes('만') ? ((K.indexOf(m[1]) + 1) || 1) * 10000 : 0) + (K.indexOf(m[2]) + 1) * 1000;
+    } else if (/(^|\s)만\s*원/.test(t)) v = 10000;
+  }
+  if (v === null || v <= 0) return null;
+  return { value: Math.round(v), min: /이상|넘는|넘게|부터|초과/.test(t) };
+}
+const ORD_NAME = ['첫', '두', '세', '네'];
+function itemsSpeech(items) {
+  if (items.length === 1) return `${items[0].name}, ${won(items[0].price)}`;
+  return items.map((m, i) => `${ORD_NAME[i] || i + 1} 번째, ${m.name}, ${won(m.price)}`).join('. ');
+}
+
+/* ---------- 대화 맥락: 번호·지시어로 고르기, 비교, 되묻기 ---------- */
+// "두 번째", "2번", "마지막 거" → 직전에 보여준 후보 목록에서 메뉴를 찾는다
+function ordinalRefs(s) {
+  const out = []; const re = /(첫|두|세|네)\s*번\s*째|(?:^|[^\d])([1-4])\s*번(?!\s*테이블)|마지막/g; let m;
+  while ((m = re.exec(s))) {
+    const i = m[1] ? ORD_NAME.indexOf(m[1]) : m[2] ? +m[2] - 1 : lastList.length - 1;
+    if (lastList[i] && !out.includes(lastList[i])) out.push(lastList[i]);
+  }
+  return out;
+}
+// "그거", "이걸로" → 마지막으로 이야기한 메뉴
+function pronounRef(s) {
+  if (!/그거|그걸|그것|이거|이걸|저거|그\s*메뉴|방금/.test(s)) return null;
+  return lastMenu || (lastList.length === 1 ? lastList[0] : null);
+}
+// 문장에 나온 메뉴 이름을 모두 찾는다 ("카페라떼"와 "디카페인 카페라떼"처럼 겹치면 긴 이름만)
+function findAllMenus(s) {
+  const flat = s.replace(/\s/g, ''); const hits = [];
+  for (const m of menus) for (const n of [m.name, ...(m.aliases || [])]) {
+    const k = n.replace(/\s/g, ''); if (k.length >= 2 && flat.includes(k)) hits.push({ m, k });
+  }
+  // 긴 이름부터 찾고 지워 나가서, 짧은 이름은 따로 말했을 때만 잡는다
+  let rest = flat; const found = [];
+  for (const x of hits.sort((p, q) => q.k.length - p.k.length)) {
+    if (rest.includes(x.k)) { rest = rest.replace(x.k, '|'); if (!found.includes(x.m)) found.push(x.m); }
+  }
+  // 문장에 나온 순서대로
+  return found.sort((p, q) => flat.indexOf(p.name.replace(/\s/g, '')) - flat.indexOf(q.name.replace(/\s/g, '')));
+}
+function firstSentence(t) { const i = t.indexOf('.'); return i > 0 ? t.slice(0, i + 1) : t; }
+// 두 메뉴의 차이만 짧게: 가격 → 카페인 → 알레르기 성분 → 한 줄 설명
+function compareText(a, b) {
+  const lines = [];
+  lines.push(a.price === b.price ? `두 메뉴 모두 ${won(a.price)}이에요.`
+    : `${josa(a.name, '은', '는')} ${won(a.price)}, ${josa(b.name, '은', '는')} ${won(b.price)}으로 ${won(Math.abs(a.price - b.price))} 차이예요.`);
+  if (a.caffeine !== b.caffeine) { const [y, n] = a.caffeine ? [a, b] : [b, a]; lines.push(`${y.name}에는 카페인이 있고, ${n.name}에는 없어요.`); }
+  if (Array.isArray(a.allergens) && Array.isArray(b.allergens)) {
+    const onlyA = a.allergens.filter(x => !b.allergens.includes(x)), onlyB = b.allergens.filter(x => !a.allergens.includes(x));
+    if (onlyA.length) lines.push(`${a.name}에만 ${onlyA.join(', ')} 성분이 있어요.`);
+    if (onlyB.length) lines.push(`${b.name}에만 ${onlyB.join(', ')} 성분이 있어요.`);
+  } else lines.push('한쪽 메뉴는 알레르기 정보가 등록되지 않았어요. 직원에게 확인해 주세요.');
+  lines.push(`${a.name}: ${firstSentence(a.desc)}`, `${b.name}: ${firstSentence(b.desc)}`);
+  lines.push('어느 쪽으로 할까요? "첫 번째로 한 잔"처럼 말씀해 주세요.');
+  return lines.join('\n');
+}
+// 후보가 많을 때, 후보를 가장 잘 나누는 질문 하나만 되묻는다
+function clarifyFor(pool) {
+  const caf = pool.filter(m => m.caffeine).length;
+  if (caf && caf < pool.length) return { key:'caffeine', q:'카페인이 있는 메뉴와 없는 메뉴 중 어느 쪽을 원하세요?', chips:['카페인 있는 거', '카페인 없는 거', '상관없어'] };
+  const hasMilk = m => Array.isArray(m.allergens) && m.allergens.includes('우유');
+  const milk = pool.filter(hasMilk).length;
+  if (milk && milk < pool.length) return { key:'milk', q:'우유가 들어간 부드러운 메뉴와 우유 없는 깔끔한 메뉴 중 어느 쪽이 좋으세요?', chips:['우유 들어간 거', '우유 없는 거', '상관없어'] };
+  return null;
+}
+function applyClarify(c, s) {
+  const hasMilk = m => Array.isArray(m.allergens) && m.allergens.includes('우유');
+  if (/상관|아무거나|다\s*괜찮|둘\s*다/.test(s)) return { pool:c.pool, label:c.label };
+  if (c.key === 'caffeine') {
+    if (/없|디카|빼|싫/.test(s)) return { pool:c.pool.filter(m => !m.caffeine), label:`카페인 없는 ${c.label}` };
+    if (/있|진한|들어/.test(s)) return { pool:c.pool.filter(m => m.caffeine), label:`카페인 있는 ${c.label}` };
+  }
+  if (c.key === 'milk') {
+    if (/없|빼|깔끔|싫/.test(s)) return { pool:c.pool.filter(m => !hasMilk(m)), label:`우유 없는 ${c.label}` };
+    if (/들어|있|부드러|라떼/.test(s)) return { pool:c.pool.filter(hasMilk), label:`우유 들어간 ${c.label}` };
+  }
+  return null;
+}
+const COMPARE_RE = /차이|비교|뭐가\s*달라|다른\s*점|어느\s*(게|것이|쪽이)\s*(나아|좋아|나을)|뭐가\s*(나아|좋아|나을)/;
+
+// 반환: { text, items?, actions?, chips?, askAI? }
+function ruleEngine(raw) {
+  const s = raw.replace(/\s+/g, ' ').trim();
+  const wasPending = pendingConfirm; pendingConfirm = false;
+
+  // 1. 직원 호출
+  if (RE.staff.test(s)) {
+    if (RE.staffNow.test(s)) { callStaff(); return { text:'직원을 불렀어요. 잠시만 기다려 주세요.' }; }
+    return { text:'직원을 불러 드릴까요?', actions:[{ label:'직원 호출하기', primary:true, run:() => { callStaff(); } }] };
+  }
+  // 2. 주문 확정
+  if (wasPending && RE.confirm.test(s) || /주문\s*확정/.test(s)) {
+    if (!cartCount()) return { text:'아직 담은 메뉴가 없어요. 먼저 메뉴를 골라 주세요.' };
+    setTimeout(placeOrder, 400);
+    return { text:'주문을 전달할게요.' };
+  }
+  if (RE.hello.test(s)) return { text:'안녕하세요. 드시고 싶은 메뉴나 조건을 말씀해 주세요. 메뉴 종류부터 들으셔도 돼요.', chips:['메뉴 종류 알려줘', '많이 찾는 메뉴'] };
+  // 되물은 질문에 대한 답
+  const clar = pendingClarify; pendingClarify = null;
+  if (clar) {
+    const r = applyClarify(clar, s);
+    if (r) {
+      if (!r.pool.length) return { text:`${r.label} 메뉴는 지금 없어요. 다른 조건으로 물어봐 주세요.` };
+      lastPool = r.pool; lastShown = Math.min(3, r.pool.length);
+      return { text:`${r.label} 메뉴는 ${r.pool.length}가지예요.${r.pool.length > 3 ? ' 먼저 3개 알려 드릴게요.' : ''}`, items:r.pool.slice(0, 3) };
+    }
+  }
+  const refs = ordinalRefs(s);
+  // 두 메뉴 비교: "첫 번째랑 두 번째 차이 뭐야", "아메리카노랑 콜드브루 뭐가 달라"
+  if (COMPARE_RE.test(s)) {
+    const named = findAllMenus(s);
+    const picked = [...refs, ...named.filter(m => !refs.includes(m))];
+    let pair;
+    if (picked.length >= 2) pair = picked;
+    else if (picked.length === 1) pair = lastMenu && lastMenu !== picked[0] ? [lastMenu, picked[0]] : [];
+    else pair = lastList.slice(0, 2);
+    if (pair.length < 2) return { text: picked.length === 1 ? `${josa(picked[0].name, '을', '를')} 어떤 메뉴와 비교할까요? 예: "${picked[0].name}랑 아메리카노 차이"` : '비교할 메뉴 두 가지를 말씀해 주세요. 예: "아메리카노랑 콜드브루 차이 알려줘"' };
+    return { text:compareText(pair[0], pair[1]), items:pair.slice(0, 2), quietItems:true };
+  }
+  const menu = findMenuByName(s) || refs[0] || pronounRef(s);
+  // 3. 장바구니 확인 / 주문하기
+  if (!menu && RE.cart.test(s)) {
+    if (!cartCount()) return { text:'아직 담은 메뉴가 없어요. 드시고 싶은 메뉴를 말씀해 주세요.', chips:['많이 찾는 메뉴', '메뉴 종류 알려줘'] };
+    pendingConfirm = true;
+    return { text:`지금 담은 메뉴는 ${cartSummaryText()}이에요.\n이대로 주문하려면 "주문 확정"이라고 말하거나 아래 버튼을 눌러 주세요.`,
+      actions:[{ label:`${won(cartTotal())} 주문하기`, primary:true, run:placeOrder }, { label:'장바구니 수정', run:() => go('#/cart') }] };
+  }
+  // 4. 특정 메뉴
+  if (menu) {
+    if (RE.remove.test(s)) {
+      if (!cart.find(c => c.id === menu.id)) return { text:`${josa(menu.name, '은', '는')} 담겨 있지 않아요.` };
+      setQty(menu.id, 0); lastMenu = menu;
+      return { text:`${josa(menu.name, '을', '를')} 뺐어요.` + (cartCount() ? ` 지금 ${cartSummaryText()}이에요.` : ' 장바구니가 비었어요.') };
+    }
+    let rest = s.replace(/\s/g, '');
+    [menu.name, ...(menu.aliases || [])].forEach(n => { rest = rest.split(n.replace(/\s/g, '')).join(' '); });
+    if (RE.allergyWord.test(s) || (RE.negation.test(rest) && mentionedAllergens(rest).length)) {
+      return { text:`${menu.name}의 알레르기 정보: ${allergenText(menu)}\n조리 과정에서 섞일 수 있는지는 등록되어 있지 않아요. 알레르기가 있다면 꼭 직원에게 확인해 주세요.`,
+        actions:[{ label:'직원 호출하기', run:callStaff }] };
+    }
+    if (RE.add.test(s) && !/얼마|가격|설명|어때|뭐야|알려|무슨\s*맛/.test(s)) {
+      if (menu.soldOut) return { text:`죄송해요. ${josa(menu.name, '은', '는')} 지금 품절이에요. 비슷한 메뉴를 추천해 드릴까요?`, chips:[`${menu.category} 추천해줘`] };
+      const q = parseQty(s); addToCart(menu.id, q); lastMenu = menu;
+      return { text:`${menu.name} ${q}개를 담았어요. 지금 ${cartSummaryText()}이에요.\n더 고르시거나 "주문할게"라고 말씀해 주세요.` };
+    }
+    return { text:`${menu.name}, ${menu.soldOut ? '지금은 품절이에요.' : won(menu.price) + '이에요.'}\n${menu.desc}\n${menu.caffeine ? '카페인이 들어 있어요.' : '카페인이 없어요.'}\n알레르기 정보: ${allergenText(menu)}`,
+      items:[menu] };
+  }
+  // 5. 알레르기 성분으로 찾기
+  const alg = mentionedAllergens(s);
+  const cat = detectCategory(s);
+  if (alg.length && RE.negation.test(s)) {
+    const safe = available().filter(m => Array.isArray(m.allergens) && !m.allergens.some(a => alg.includes(a))
+      && (!cat || m.category === cat) && (!NO_CAFFEINE.test(s) || !m.caffeine));
+    const unknown = available().filter(m => m.allergens === null && (!cat || m.category === cat));
+    if (!safe.length) return { text:`등록된 정보로는 ${alg.join(', ')} 성분이 빠진 메뉴를 찾지 못했어요. 직원에게 확인해 주세요.`, actions:[{ label:'직원 호출하기', run:callStaff }] };
+    lastPool = safe; lastShown = Math.min(4, safe.length);
+    return { text:`등록된 정보 기준으로 ${alg.join(', ')} 성분이 표시되지 않은 메뉴예요.${unknown.length ? `\n${unknown.map(m => m.name).join(', ')}${josa(unknown[unknown.length-1].name,'은','는').slice(-1)} 알레르기 정보가 아직 등록되지 않아 뺐어요.` : ''}\n조리 과정에서 섞일 수 있는지는 확인되지 않았으니, 드시기 전에 꼭 직원에게 확인해 주세요.`,
+      items:safe.slice(0, 4), actions:[{ label:'직원 호출하기', run:callStaff }] };
+  }
+  if (RE.allergyWord.test(s) && /알레르기|알러지/.test(s) && !alg.length) {
+    return { text:'말씀하신 성분은 메뉴 정보에 따로 등록되어 있지 않아 확인해 드릴 수 없어요. 직원에게 꼭 확인해 주세요.', actions:[{ label:'직원 호출하기', primary:true, run:callStaff }] };
+  }
+  if (alg.length && RE.containsWord.test(s)) {
+    const withIt = available().filter(m => Array.isArray(m.allergens) && m.allergens.some(a => alg.includes(a)));
+    if (withIt.length) { lastPool = withIt; lastShown = Math.min(3, withIt.length); return { text:`등록된 정보 기준으로 ${alg.join(', ')}${josa(alg[alg.length-1],'이','가').slice(-1)} 들어간 메뉴예요.\n등록되지 않은 메뉴도 있을 수 있으니 꼭 직원에게 확인해 주세요.`, items:withIt.slice(0, 3), actions:[{ label:'직원 호출하기', run:callStaff }] }; }
+  }
+  // 성분을 묻는 질문은 위에서 답하지 못했더라도 AI에게 넘기지 않는다 (추측 답변 방지)
+  if ((alg.length && (RE.allergyWord.test(s) || RE.containsWord.test(s))) || /알레르기|알러지|알르레기/.test(s)) {
+    return { text:`${alg.length ? `등록된 정보로는 ${alg.join(', ')} 성분을 확인할 수 있는 메뉴가 없어요.` : '성분은 메뉴별로 등록된 정보만 안내할 수 있어요.'}\n메뉴 이름과 함께 물어보시거나, 직원에게 꼭 확인해 주세요. 예: "카페라떼 알레르기 알려줘"`,
+      actions:[{ label:'직원 호출하기', primary:true, run:callStaff }] };
+  }
+  // 6. 더 보기
+  if (RE.more.test(s) && lastPool.length && !cat) {
+    const next = lastPool.slice(lastShown, lastShown + 3);
+    if (!next.length) return { text:'조건에 맞는 메뉴는 여기까지예요.' };
+    lastShown += next.length;
+    return { text:`이어서 ${next.length}개 더 알려 드릴게요.`, items:next };
+  }
+  // 7. 메뉴 종류 안내 (전체를 다 읽지 않고 먼저 좁힌다)
+  if (RE.listAll.test(s) && !cat && !RE.latte.test(s)) {
+    const counts = CATEGORIES.map(c => [c, available().filter(m => m.category === c).length]).filter(x => x[1]);
+    return { text:`지금 주문할 수 있는 메뉴는 ${counts.map(([c, n]) => `${c} ${n}개`).join(', ')}예요.\n어떤 종류를 알려 드릴까요?`,
+      chips: counts.map(([c]) => `${c} 메뉴 알려줘`) };
+  }
+  // 8. 조건 추천
+  let pool = available(); const conds = [];
+  if (NO_CAFFEINE.test(s)) { pool = pool.filter(m => !m.caffeine); conds.push('카페인 없는'); }
+  const b = parseBudget(s);
+  if (b) { pool = pool.filter(m => b.min ? m.price >= b.value : m.price <= b.value); conds.push(`${won(b.value)} ${b.min ? '이상' : '이하'}`); }
+  if (RE.latte.test(s)) { pool = pool.filter(m => m.name.includes('라떼')); conds.push('라떼'); }
+  else if (cat) { pool = pool.filter(m => m.category === cat); conds.push(cat); }
+  if (RE.cheap.test(s)) { pool.sort((x, y) => x.price - y.price); conds.push('저렴한 순'); }
+  else pool.sort((x, y) => (y.popular ? 1 : 0) - (x.popular ? 1 : 0));
+
+  if (conds.length) {
+    // "커피 추천해줘"처럼 분류만 말하고 후보가 많으면, 목록을 읽기 전에 한 번만 되묻는다
+    const onlyCategory = conds.length === 1 && (cat || RE.latte.test(s));
+    if (onlyCategory && RE.recommend.test(s) && pool.length > 3) {
+      const c = clarifyFor(pool);
+      if (c) { pendingClarify = Object.assign(c, { pool, label:conds[0] }); return { text:c.q, chips:c.chips }; }
+    }
+    if (!pool.length) return { text:`${conds.join(', ')} 조건에 맞는 메뉴가 지금은 없어요. 조건을 바꿔서 물어봐 주세요.`, chips:['많이 찾는 메뉴', '메뉴 종류 알려줘'] };
+    lastPool = pool; lastShown = Math.min(3, pool.length);
+    const more = pool.length > 3 ? `\n모두 ${pool.length}개예요. 더 들으려면 "더 보여줘"라고 말씀해 주세요.` : '';
+    return { text:`${conds.join(', ')} 메뉴 중에서 골랐어요.${more}`, items:pool.slice(0, 3) };
+  }
+  if (RE.recommend.test(s)) {
+    const pop = available().filter(m => m.popular);
+    lastPool = pop; lastShown = Math.min(3, pop.length);
+    return { text:'이 매장에서 많이 찾는 메뉴예요.', items:pop.slice(0, 3), askAI:true };
+  }
+  return { text:'잘 이해하지 못했어요. 이렇게 물어봐 주세요.\n예: "카페인 없는 메뉴", "5천 원 이하 논커피", "아메리카노 두 잔 담아줘"',
+    chips:['많이 찾는 메뉴', '카페인 없는 메뉴', '우유 없는 메뉴'], askAI:true };
+}
+
+// AI 서버에 묻기. 실패하면 규칙 엔진 답을 그대로 쓴다.
+const AI_TIMEOUT_MS = 12000; // 서버의 OpenAI 타임아웃(10초)보다 조금 길게
+async function askAI(question) {
+  // 방금 addMessage 로 넣은 이번 질문은 question 으로 따로 보내므로 history 에서 뺀다
+  const history = chat.slice(0, -1).slice(-6)
+    .filter(m => m && typeof m.text === 'string' && m.text.trim())
+    .map(m => ({ role:m.from === 'user' ? 'user' : 'assistant', text:m.text }));
+  const res = await fetch(CHAT_ENDPOINT, {
+    method:'POST', headers:{ 'Content-Type':'application/json' },
+    signal: AbortSignal.timeout ? AbortSignal.timeout(AI_TIMEOUT_MS) : undefined,
+    body: JSON.stringify({ storeId:STORE.id, table:TABLE, question, history,
+      menus }) // 실서비스에서는 서버가 DB에서 직접 메뉴를 읽으므로 보내지 않는다
+  });
+  if (!res.ok) throw new Error('chat ' + res.status); // 429·504 등은 규칙 엔진 답으로 대신한다
+  const d = await res.json();
+  const items = (Array.isArray(d.menuIds) ? d.menuIds : [])
+    .map(id => menus.find(m => String(m.id) === String(id)))
+    .filter((m, i, arr) => m && !m.soldOut && arr.indexOf(m) === i).slice(0, 3);
+  const text = String(d.text || '').trim().slice(0, 400);
+  if (!text) throw new Error('empty reply');
+  return { text, items };
+}
+
+async function send(raw, byVoice) {
+  const q = String(raw || '').trim(); if (!q) return;
+  const input = $('#q'); if (input) input.value = '';
+  addMessage({ from:'user', text:q });
+  let r = ruleEngine(q);
+  if (r.askAI && CHAT_ENDPOINT) {
+    const typing = h('div', { class:'typing', 'aria-hidden':'true', text:'답을 찾고 있어요…' });
+    $('#log')?.append(typing); scrollChat();
+    try { r = await askAI(q); } catch (e) { console.warn('AI 응답 실패, 규칙 엔진 답 사용:', e); }
+    typing.remove();
+  }
+  if (r.items?.length) {
+    lastList = r.items; if (r.items.length === 1) lastMenu = r.items[0];
+    if (r.items.length > 1 && !refHintShown && !r.quietItems) { r.text += '\n번호로 고를 수 있어요. 예: "두 번째 거 담아줘", "첫 번째랑 두 번째 차이 알려줘"'; refHintShown = true; }
+  }
+  addMessage(Object.assign({ from:'bot' }, r), byVoice);
+}
+function addMessage(msg, forceSpeak) {
+  chat.push(msg);
+  const log = $('#log');
+  if (log) { log.append(renderMsg(msg)); scrollChat(); }
+  // 말로 물어본 질문은 설정과 상관없이 답도 소리로 읽어 준다
+  if (msg.from === 'bot') speak(msg.text.replace(/\n/g, ' ') + (msg.items?.length && !msg.quietItems ? ' ' + itemsSpeech(msg.items) : ''), forceSpeak && prefs.voiceReply);
+}
+function scrollChat() { requestAnimationFrame(() => window.scrollTo({ top:document.body.scrollHeight })); }
+
+/* =========================================================
+   화면
+   ========================================================= */
+let tabObserver = null;
+function go(hash) { if (location.hash === hash) route(); else location.hash = hash; }
+function currentRoute() { return location.hash.replace(/^#\/?/, '').split('/')[0] || 'menu'; }
+let firstRender = true;
+function route(keepScroll) {
+  closeSheet(true); stopListening();
+  if (tabObserver) { tabObserver.disconnect(); tabObserver = null; }
+  const r = currentRoute();
+  const view = $('#view');
+  const y = window.scrollY;
+  route.keep = !!keepScroll;
+  if (r === 'chat') view.replaceChildren(...renderChat());
+  else if (r === 'cart') view.replaceChildren(...renderCart());
+  else if (r === 'order') view.replaceChildren(...renderOrder());
+  else if (r === 'admin') view.replaceChildren(...(session.get(KEY.adminOk, false) ? renderAdmin() : renderAdminLock()));
+  else view.replaceChildren(...renderMenu());
+  document.title = r === 'admin' ? 'Orderly 매장 관리' : STORE.name;
+  if (keepScroll) window.scrollTo(0, y);
+  else if (r === 'chat') scrollChat();
+  else window.scrollTo(0, 0);
+  if (!keepScroll && !firstRender) $('#view h1')?.focus();
+  firstRender = false;
+}
+window.addEventListener('hashchange', () => route());
+
+/* --- 손님 홈 --- */
+function renderMenu() {
+  const head = h('header', { class:'store-head' },
+    h('div', null, h('h1', { tabindex:'-1', text:STORE.name }), h('p', { class:'table-no', text:`${TABLE}번 테이블` })),
+    h('button', { class:'icon-btn', 'aria-label':'안내 방식과 글자 크기 설정', onclick:showSettings }, icon('settings')));
+  const mine = myLatestOrder();
+  const banner = mine && mine.status !== 'done'
+    ? h('button', { class:'order-banner', onclick:() => go('#/order') }, h('span', { text:`주문번호 ${mine.no} · ${STATUS[mine.status]}` }), icon('chevron'))
+    : null;
+
+  const cats = CATEGORIES.filter(c => menus.some(m => m.category === c));
+  const tabs = h('nav', { class:'tabs', 'aria-label':'메뉴 분류' },
+    cats.map((c, i) => h('button', { class:'tab', 'data-cat':c, 'aria-current': i === 0 ? 'true' : 'false',
+      onclick:() => { document.getElementById('sec-' + c)?.scrollIntoView({ behavior:'smooth' }); setActiveTab(c); } }, c)));
+  const sections = cats.map(c => h('section', { class:'menu-section', id:'sec-' + c, 'data-cat':c, 'aria-labelledby':'h-' + c },
+    h('h2', { id:'h-' + c, text:c }),
+    h('ul', { class:'menu-list' }, menus.filter(m => m.category === c).map(m => h('li', null, renderMenuRow(m))))));
+  const foot = h('footer', { class:'foot' },
+    h('p', { text:'결제는 주문 후 카운터에서 해 주세요. 휴대폰이 잘 되지 않으면 직원을 불러 주세요.' }),
+    h('div', { class:'row' }, h('button', { class:'btn btn-secondary btn-sm', onclick:callStaff }, icon('bell'), '직원 호출')),
+    h('div', { class:'brand' }, h('span', { style:'display:flex;align-items:center;gap:8px' }, logoImg('foot-logo'), '접근성 주문'), h('a', { href:'#/admin', text:'매장 관리자' })));
+
+  setTimeout(() => {
+    tabObserver = new IntersectionObserver(es => {
+      const vis = es.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (vis) setActiveTab(vis.target.dataset.cat);
+    }, { rootMargin:'-60px 0px -70% 0px' });
+    document.querySelectorAll('.menu-section').forEach(s => tabObserver.observe(s));
+  });
+  return [head, banner, tabs, ...sections, foot, renderCartBar(), renderLauncher()].filter(Boolean);
+}
+function renderLauncher() {
+  const closed = session.get('orderly.hintClosed', false);
+  const wrap = h('div', { class:'bot-launcher' + (currentRoute() === 'menu' && cartCount() ? ' lift' : ''), id:'botLauncher' });
+  if (!closed) {
+    const hint = h('div', { class:'bot-hint' },
+      h('button', { class:'open', onclick:() => go('#/chat') }, h('span', { class:'face' }, mascot()),
+        h('span', null, h('b', null, h('span', { class:'tag', text:'AI 챗봇' }), BOT_NAME), h('small', { text:'궁금한 메뉴를 물어보면 AI가 답변해요.' }))),
+      h('button', { class:'x', 'aria-label':'안내 말풍선 닫기', onclick:() => { session.set('orderly.hintClosed', true); hint.remove(); } }, icon('close')));
+    wrap.append(hint);
+  }
+  wrap.append(h('button', { class:'bot-fab', 'aria-label':`AI 챗봇 ${BOT_NAME} 열기. 말이나 글로 메뉴를 추천받고 주문할 수 있어요`, onclick:() => go('#/chat') }, logoImg()));
+  return wrap;
+}
+function setActiveTab(c) { document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.cat === c ? 'true' : 'false')); }
+function renderMenuRow(m) {
+  const label = `${m.name}, ${m.soldOut ? '품절' : won(m.price)}${m.popular ? ', 인기 메뉴' : ''}`;
+  return h('button', { class:'menu-row' + (m.soldOut ? ' soldout' : ''), 'aria-label':label, onclick:() => showItem(m.id) },
+    h('div', { class:'info' },
+      h('p', { class:'name' }, m.name,
+        m.popular && !m.soldOut ? h('span', { class:'badge best', text:'인기' }) : null,
+        m.soldOut ? h('span', { class:'badge out', text:'품절' }) : null),
+      h('p', { class:'desc', text:m.desc }),
+      h('p', { class:'price', text: m.soldOut ? '오늘 준비된 수량이 모두 나갔어요' : won(m.price) })),
+    h('div', { class:'thumb' }, icon(CAT_ICON[m.category] || 'cup')));
+}
+function renderCartBar() {
+  const n = cartCount();
+  if (!n) return h('div', { id:'cartBar' });
+  return h('div', { class:'bottom-bar', id:'cartBar' },
+    h('button', { class:'btn btn-primary cart-btn', onclick:() => go('#/cart'), 'aria-label':`장바구니 ${n}개, ${won(cartTotal())}, 주문 확인하기` },
+      h('span', { class:'l' }, h('span', { class:'count', text:n }), '장바구니 보기'), h('span', { text:won(cartTotal()) })));
+}
+
+/* --- 메뉴 상세 시트 --- */
+function showItem(id) {
+  const m = getMenu(id); if (!m) return;
+  let qty = 1;
+  const out = h('output', { 'aria-live':'polite', text:'1' });
+  const addBtn = h('button', { class:'btn btn-primary', disabled:m.soldOut, onclick:() => {
+    if (addToCart(m.id, qty)) { closeSheet(); toast(`${m.name} ${qty}개를 담았어요.`, true); }
+  } }, m.soldOut ? '품절된 메뉴예요' : `${qty}개 담기 · ${won(m.price)}`);
+  const upd = () => { out.textContent = qty; addBtn.textContent = `${qty}개 담기 · ${won(m.price * qty)}`; };
+  openSheet(m.name,
+    h('h2', { text:m.name }),
+    h('p', { class:'lead', text:m.desc }),
+    h('p', { class:'price-big', text: m.soldOut ? '품절' : won(m.price) }),
+    h('dl', { class:'meta' },
+      h('div', null, h('dt', { text:'카페인' }), h('dd', { text: m.caffeine ? '들어 있어요' : (m.category === '디카페인' ? '대부분 뺐어요 (아주 조금 남을 수 있어요)' : '없어요') })),
+      h('div', null, h('dt', { text:'알레르기' }), h('dd', { text:allergenText(m) }))),
+    h('div', { class:'sheet-actions' },
+      h('button', { class:'btn btn-secondary btn-sm', onclick:() => speak(`${m.name}. ${m.soldOut ? '품절' : won(m.price)}. ${m.desc} ${m.caffeine ? '카페인이 들어 있어요.' : ''} 알레르기 정보: ${allergenText(m)}`, true) }, icon('speaker'), '설명 듣기'),
+      m.soldOut ? null : h('div', { class:'stepper', role:'group', 'aria-label':'수량' },
+        h('button', { 'aria-label':'하나 빼기', onclick:() => { if (qty > 1) { qty--; upd(); } } }, icon('minus')), out,
+        h('button', { 'aria-label':'하나 더하기', onclick:() => { if (qty < 20) { qty++; upd(); } } }, icon('plus')))),
+    h('div', { class:'sheet-foot' }, addBtn));
+}
+
+/* --- 챗봇 화면 --- */
+function renderChat() {
+  if (!chat.length) chat.push({ from:'bot', text:`안녕하세요. ${STORE.name} 메뉴를 안내해 드릴게요.\n드시고 싶은 메뉴나 조건을 말씀해 주세요.` });
+  const head = h('header', { class:'page-head' },
+    h('button', { class:'icon-btn', 'aria-label':'메뉴로 돌아가기', onclick:() => go('#/') }, icon('back')),
+    h('h1', { tabindex:'-1' }, h('span', { class:'sr-only', text:`AI 챗봇 ${BOT_NAME}` }), h('span', { 'aria-hidden':'true', style:'display:flex;align-items:center;gap:8px' }, logoImg('head-logo'), 'AI 챗봇')),
+    h('button', { class:'icon-btn', 'aria-label':'안내 방식과 글자 크기 설정', onclick:showSettings }, icon('settings')));
+  const log = h('div', { class:'chat-log', id:'log', role:'log', 'aria-live':'polite', 'aria-label':'챗봇 대화' }, chat.map(renderMsg));
+  const chips = h('div', { class:'chips', role:'group', 'aria-label':'자주 하는 질문' },
+    ['커피 추천해줘', '카페인 없는 메뉴', '5천 원 이하', '우유 없는 메뉴', '디저트 추천', '담은 메뉴 확인', '직원 호출'].map(t => h('button', { class:'chip', onclick:() => send(t) }, t)));
+  const mic = h('button', { type:'button', class:'mic', 'aria-pressed':'false', 'aria-label':'말로 질문하기', onclick:e => toggleMic(e.currentTarget) }, icon('mic'));
+  const form = h('form', { class:'input-row', onsubmit:e => { e.preventDefault(); send($('#q').value); } },
+    h('label', { for:'q', class:'sr-only', text:'챗봇에게 질문하기' }),
+    h('input', { id:'q', autocomplete:'off', enterkeyhint:'send', placeholder:'예: 카페인 없고 6천 원 이하' }),
+    mic,
+    h('button', { type:'submit', class:'send', 'aria-label':'보내기' }, icon('send')));
+  const composer = h('div', { class:'composer' }, renderCartStrip(), form);
+  // 음성 안내 모드면 첫 인사를 읽어 준다
+  if (chat.length === 1) setTimeout(() => speak(chat[0].text.replace(/\n/g, ' ')), 300);
+  return [head, h('main', { class:'chat' }, log, chips), composer];
+}
+function renderCartStrip() {
+  const n = cartCount();
+  if (!n) return h('div', { id:'cartStrip' });
+  return h('div', { class:'cart-strip', id:'cartStrip' },
+    h('span', null, '담은 메뉴 ', h('b', { text:`${n}개 · ${won(cartTotal())}` })),
+    h('button', { onclick:() => go('#/cart') }, '주문 확인'));
+}
+function renderMsg(msg) {
+  if (msg.from === 'user') return h('div', { class:'msg user' }, h('span', { class:'sr-only', text:'나: ' }), msg.text);
+  const box = h('div', { class:'msg bot' }, h('p', { class:'who' }, h('span', { class:'av' }, mascot()), BOT_NAME), h('div', { class:'text', text:msg.text }));
+  if (msg.items?.length) box.append(h('div', { class:'cards' }, msg.items.map((m, i) => h('div', { class:'card-row' }, msg.items.length > 1 ? h('span', { class:'num', 'aria-hidden':'true', text:i + 1 }) : null,
+    h('div', { class:'t' }, h('b', { text:m.name }), h('small', { text: m.soldOut ? '품절' : won(m.price) })),
+    h('button', { class:'add-btn', disabled:m.soldOut, 'aria-label':`${msg.items.length > 1 ? (ORD_NAME[i] || i + 1) + ' 번째, ' : ''}${m.name} 담기`, onclick:() => {
+      lastMenu = m; if (addToCart(m.id, 1)) addMessage({ from:'bot', text:`${m.name} 1개를 담았어요. 지금 ${cartSummaryText()}이에요.` });
+    } }, m.soldOut ? '품절' : '담기')))));
+  if (msg.actions?.length) box.append(h('div', { class:'acts' }, msg.actions.map(a =>
+    h('button', { class:'btn btn-sm ' + (a.primary ? 'btn-primary' : 'btn-secondary'), onclick:a.run }, a.label))));
+  if (msg.chips?.length) box.append(h('div', { class:'acts' }, msg.chips.map(t => h('button', { class:'chip', onclick:() => send(t) }, t))));
+  const speech = msg.text.replace(/\n/g, ' ') + (msg.items?.length ? ' ' + itemsSpeech(msg.items) : '');
+  box.append(h('button', { class:'replay', 'aria-label':'이 답변 다시 듣기', onclick:() => speak(speech, true) }, icon('speaker'), '다시 듣기'));
+  return box;
+}
+
+/* --- 장바구니 --- */
+function renderCart() {
+  const head = h('header', { class:'page-head' },
+    h('button', { class:'icon-btn', 'aria-label':'뒤로 가기', onclick:() => history.length > 1 ? history.back() : go('#/') }, icon('back')),
+    h('h1', { tabindex:'-1', text:'주문 확인' }));
+  const lines = cartLines();
+  if (!lines.length) return [head, h('div', { class:'empty' }, h('b', { text:'담은 메뉴가 없어요' }), '메뉴판이나 챗봇에서 메뉴를 골라 주세요.'),
+    h('div', { class:'stack' }, h('button', { class:'btn btn-primary', onclick:() => go('#/') }, '메뉴 보러 가기'))];
+  const list = h('ul', { class:'cart-list' }, lines.map(({ m, qty }) => h('li', { class:'cart-item' },
+    h('div', { class:'t' }, h('b', { text:m.name }), h('span', { text:won(m.price * qty) })),
+    h('div', { class:'stepper', role:'group', 'aria-label':`${m.name} 수량 ${qty}개` },
+      h('button', { 'aria-label':qty === 1 ? `${m.name} 빼기` : `${m.name} 하나 빼기`, onclick:() => { setQty(m.id, qty - 1); route(true); } }, icon('minus')),
+      h('output', { text:qty }),
+      h('button', { 'aria-label':`${m.name} 하나 더하기`, onclick:() => { setQty(m.id, qty + 1); route(true); } }, icon('plus'))))));
+  const body = h('main', { class:'pad' },
+    h('span', { class:'table-chip', text:`${TABLE}번 테이블` }), list,
+    h('div', { class:'sum' }, h('span', { text:'합계' }), h('span', { text:won(cartTotal()) })),
+    h('p', { class:'notice', text:'주문하기를 누르면 매장으로 주문이 전달돼요. 결제는 카운터에서 해 주세요.' }));
+  const bar = h('div', { class:'bottom-bar' }, h('button', { class:'btn btn-primary', onclick:placeOrder }, `${won(cartTotal())} 주문하기`));
+  if (!route.keep) setTimeout(() => speak(`담은 메뉴는 ${cartSummaryText()}이에요. 주문하려면 화면 아래 주문하기 버튼을 눌러 주세요.`), 200);
+  else speak(cartSummaryText());
+  return [head, body, bar];
+}
+
+/* --- 주문 상태 --- */
+function renderOrder() {
+  const head = h('header', { class:'page-head' },
+    h('button', { class:'icon-btn', 'aria-label':'메뉴로 돌아가기', onclick:() => go('#/') }, icon('back')),
+    h('h1', { tabindex:'-1', text:'주문 상태' }));
+  const o = myLatestOrder();
+  if (!o) return [head, h('div', { class:'empty' }, h('b', { text:'주문 내역이 없어요' }), '이 휴대폰에서 주문한 내역이 여기에 표시돼요.')];
+  const msg = { received:['주문이 접수되었어요', '매장에서 곧 확인할 거예요.'], preparing:['메뉴를 준비하고 있어요', '조금만 기다려 주세요.'], done:['준비가 끝났어요', '곧 자리로 가져다 드릴게요.'] }[o.status];
+  const idx = ['received', 'preparing', 'done'].indexOf(o.status);
+  return [head,
+    h('section', { class:'status-hero', 'aria-live':'polite' },
+      h('div', { class:'mark' }, icon('check')),
+      h('h2', { style:'margin:0;font-size:1.375rem', text:msg[0] }), h('p', { text:msg[1] }),
+      h('p', { class:'order-no', 'aria-label':`주문번호 ${o.no}번`, text:o.no }), h('p', { text:`주문번호 · ${o.table}번 테이블` })),
+    h('ol', { class:'steps', 'aria-label':'진행 단계' }, ['접수', '준비 중', '완료'].map((t, i) =>
+      h('li', { class: i <= idx ? 'on' : '', 'aria-current': i === idx ? 'step' : null, text:t }))),
+    h('div', { class:'receipt' }, o.items.map(it => h('div', { class:'r' }, h('span', { text:`${it.name} × ${it.qty}` }), h('span', { text:won(it.price * it.qty) }))),
+      h('div', { class:'r' }, h('span', { text:'합계' }), h('span', { text:won(o.total) }))),
+    h('div', { class:'stack' },
+      h('p', { class:'notice', text:'결제는 카운터에서 해 주세요.' }),
+      h('button', { class:'btn btn-secondary', onclick:() => go('#/') }, '추가 주문하기'),
+      h('button', { class:'btn btn-secondary', onclick:callStaff }, icon('bell'), '직원 호출')),
+    h('div', { style:'height:200px' }), renderLauncher()];
+}
+
+/* --- 설정 --- */
+function showSettings() {
+  const sw = (on, label, fn) => { const b = h('button', { class:'switch', role:'switch', 'aria-checked':String(on), 'aria-label':label });
+    b.addEventListener('click', () => { const v = b.getAttribute('aria-checked') !== 'true'; b.setAttribute('aria-checked', String(v)); fn(v); }); return b; };
+  openSheet('설정',
+    h('h2', { text:'설정' }),
+    h('div', { class:'setting' }, h('div', null, h('b', { text:'모든 답변 소리로 읽기' }), h('small', { text:'글자로 물어도 챗봇 답변과 주문 내용을 소리로 읽어요. VoiceOver나 TalkBack을 쓰고 있다면 소리가 겹칠 수 있으니 꺼 두세요.' })),
+      sw(prefs.voice, '음성 안내', v => { prefs.voice = v; prefs.chosen = true; local.set(KEY.prefs, prefs); if (v) speak('음성 안내를 켰어요.'); else stopSpeaking(); })),
+    h('div', { class:'setting' }, h('div', null, h('b', { text:'말로 물으면 소리로 답하기' }), h('small', { text:'마이크로 질문하면 답을 소리로 읽어요. 화면낭독기를 쓰고 있다면 꺼 두세요.' })),
+      sw(prefs.voiceReply, '말로 물으면 소리로 답하기', v => { prefs.voiceReply = v; local.set(KEY.prefs, prefs); if (!v) stopSpeaking(); })),
+    h('div', { class:'setting' }, h('div', null, h('b', { text:'큰 글씨' }), h('small', { text:'메뉴와 버튼 글자를 크게 보여 줘요.' })),
+      sw(prefs.large, '큰 글씨', v => { prefs.large = v; local.set(KEY.prefs, prefs); document.documentElement.classList.toggle('large', v); })),
+    h('div', { class:'sheet-foot' }, h('button', { class:'btn btn-secondary', onclick:() => closeSheet() }, '닫기')));
+}
+
+/* =========================================================
+   매장 관리자 (#/admin)
+   실서비스에서는 별도 주소 + 매장 계정 로그인이 필요하다.
+   ========================================================= */
+function renderAdminLock() {
+  let pin = '';
+  let fails = session.get('orderly.pinFails', 0);
+  const dots = h('div', { class:'dots', 'aria-hidden':'true' }, [0, 1, 2, 3].map(() => h('span')));
+  const status = h('p', { class:'sr-only', 'aria-live':'polite' });
+  const msg = h('p', { class:'lock-msg', role:'alert' });
+  const lockedLeft = () => Math.max(0, Math.ceil(((local.get(KEY.lockUntil, 0) || 0) - Date.now()) / 1000));
+  const paint = () => {
+    dots.querySelectorAll('span').forEach((d, i) => d.classList.toggle('on', i < pin.length));
+    status.textContent = `${pin.length}자리 입력됨`;
+  };
+  const setLocked = () => {
+    const left = lockedLeft();
+    keypad.querySelectorAll('button').forEach(b => { b.disabled = left > 0; });
+    if (left > 0) { msg.textContent = `번호를 여러 번 틀렸어요. ${left}초 후에 다시 입력해 주세요.`; setTimeout(setLocked, 1000); }
+    else if (msg.textContent.includes('초 후')) msg.textContent = '';
+  };
+  const check = () => {
+    if (pin === ADMIN_PIN) {
+      session.set(KEY.adminOk, true); session.set('orderly.pinFails', 0);
+      document.removeEventListener('keydown', onKey); route(); return;
+    }
+    fails++; session.set('orderly.pinFails', fails);
+    pin = ''; paint();
+    dots.classList.remove('shake'); void dots.offsetWidth; dots.classList.add('shake');
+    if (fails >= 5) { local.set(KEY.lockUntil, Date.now() + 30000); session.set('orderly.pinFails', 0); fails = 0; setLocked(); }
+    else msg.textContent = `번호가 맞지 않아요. 다시 입력해 주세요. (${fails}/5)`;
+  };
+  const press = d => {
+    if (lockedLeft() > 0 || pin.length >= 4) return;
+    pin += d; paint();
+    if (pin.length === 4) setTimeout(check, 120);
+  };
+  const back = () => { pin = pin.slice(0, -1); paint(); };
+  const keypad = h('div', { class:'keypad', role:'group', 'aria-label':'번호 입력' },
+    ['1','2','3','4','5','6','7','8','9'].map(d => h('button', { onclick:() => press(d) }, d)),
+    h('button', { class:'fn', onclick:() => { pin = ''; paint(); }, 'aria-label':'모두 지우기' }, '전체 삭제'),
+    h('button', { onclick:() => press('0') }, '0'),
+    h('button', { class:'fn', onclick:back, 'aria-label':'한 자리 지우기' }, '지우기'));
+  // PC에서는 키보드 숫자로도 입력할 수 있다
+  function onKey(e) {
+    if (currentRoute() !== 'admin') { document.removeEventListener('keydown', onKey); return; }
+    if (/^[0-9]$/.test(e.key)) press(e.key);
+    else if (e.key === 'Backspace') back();
+  }
+  if (renderAdminLock.key) document.removeEventListener('keydown', renderAdminLock.key);
+  renderAdminLock.key = onKey;
+  document.addEventListener('keydown', onKey);
+  setTimeout(setLocked);
+  return [h('main', { class:'lock' },
+    h('div', { class:'lock-top' }, h('button', { class:'icon-btn', 'aria-label':'손님 화면으로 돌아가기', onclick:() => { document.removeEventListener('keydown', onKey); go('#/'); } }, icon('back'))),
+    logoImg('lock-logo'),
+    h('h1', { tabindex:'-1', text:'매장 관리자' }),
+    h('p', { class:'lead', text:`${STORE.name} 관리자 번호 4자리를 입력해 주세요.` }),
+    dots, status, msg, keypad,
+    h('p', { class:'lock-note', text:'시연용 관리자 번호는 1234예요.' }))];
+}
+function renderAdmin() {
+  const orders = loadOrders();
+  const active = orders.filter(o => o.status !== 'done').sort((a, b) => a.at - b.at);
+  const head = h('header', { class:'admin-head' },
+    h('div', null, logoImg('admin-logo'), h('small', { text:`${STORE.name} 매장 관리` })),
+    h('div', { style:'display:flex;align-items:center' },
+      h('a', { href:'#/', class:'link-btn', style:'display:inline-flex;align-items:center', text:'손님 화면' }),
+      h('button', { class:'link-btn', style:'color:var(--sub)', onclick:() => { session.set(KEY.adminOk, false); toast('관리자 화면을 잠갔어요.'); go('#/'); } }, '잠금')));
+  const h1 = h('h1', { class:'sr-only', tabindex:'-1', text:'매장 관리' });
+  const seg = h('div', { class:'seg', role:'tablist' },
+    h('button', { role:'tab', 'aria-selected':String(adminTab === 'orders'), onclick:() => { adminTab = 'orders'; route(true); } }, `주문 ${active.length ? active.length + '건' : ''}`),
+    h('button', { role:'tab', 'aria-selected':String(adminTab === 'menu'), onclick:() => { adminTab = 'menu'; route(true); } }, '메뉴'));
+  return [head, h1, seg, adminTab === 'orders' ? renderAdminOrders(orders) : renderAdminMenu()];
+}
+function renderAdminOrders(orders) {
+  const active = orders.filter(o => o.status !== 'done').sort((a, b) => a.at - b.at);
+  const done = orders.filter(o => o.status === 'done').sort((a, b) => b.at - a.at).slice(0, 10);
+  const setStatus = (id, st) => { const all = loadOrders(); const o = all.find(x => x.id === id); if (o) { o.status = st; saveOrders(all); route(true); } };
+  const card = o => {
+    if (o.type === 'staff') return h('article', { class:'order-card staff' },
+      h('div', { class:'top' }, h('b', { text:`${o.table}번 테이블 · 직원 호출` }), h('time', { text:fmtTime(o.at) })),
+      o.status !== 'done' ? h('div', { class:'bottom', style:'margin-top:12px' }, h('span', { class:'pill received', text:'대기' }),
+        h('button', { class:'btn btn-primary btn-sm', onclick:() => setStatus(o.id, 'done') }, '확인했어요')) : null);
+    const next = { received:['preparing', '준비 시작'], preparing:['done', '준비 완료'] }[o.status];
+    return h('article', { class:'order-card' },
+      h('div', { class:'top' }, h('b', { text:`#${o.no} · ${o.table}번 테이블` }), h('time', { text:fmtTime(o.at) })),
+      h('ul', null, o.items.map(it => h('li', { text:`${it.name} × ${it.qty}` }))),
+      h('div', { class:'bottom' },
+        h('span', null, h('span', { class:'pill ' + o.status, text:STATUS[o.status] }), ' ', h('b', { text:won(o.total) })),
+        next ? h('button', { class:'btn btn-primary btn-sm', onclick:() => setStatus(o.id, next[0]) }, next[1]) : null));
+  };
+  return h('main', { class:'admin-body' },
+    active.length ? active.map(card) : h('div', { class:'empty', style:'padding:40px 0' }, h('b', { text:'처리할 주문이 없어요' }), '손님이 주문하면 여기에 바로 나타나요.'),
+    done.length ? [h('p', { class:'sec-title', text:'완료' }), done.map(card)] : null);
+}
+function renderAdminMenu() {
+  const rows = CATEGORIES.map(c => {
+    const list = menus.filter(m => m.category === c); if (!list.length) return null;
+    return [h('p', { class:'sec-title', text:c }), list.map(m => {
+      const sw = h('button', { class:'switch', role:'switch', 'aria-checked':String(!m.soldOut), 'aria-label':`${m.name} 판매 중` });
+      sw.addEventListener('click', () => { m.soldOut = !m.soldOut; saveMenus(); route(true); toast(m.soldOut ? `${josa(m.name, '을', '를')} 품절로 바꿨어요.` : `${josa(m.name, '을', '를')} 다시 판매해요.`); });
+      return h('div', { class:'admin-row' },
+        h('div', { class:'t' }, h('b', { text:m.name }), h('small', { text:`${won(m.price)}${m.allergens === null ? ' · 알레르기 미등록' : ''}${m.soldOut ? ' · 품절' : ''}` })),
+        h('button', { class:'link-btn', onclick:() => editMenu(m.id), 'aria-label':`${m.name} 수정` }, '수정'), sw);
+    })];
+  });
+  return h('main', { class:'admin-body' },
+    h('button', { class:'btn btn-secondary', onclick:() => editMenu(null) }, icon('plus'), '메뉴 추가'),
+    h('p', { class:'hint', text:'저장하면 손님 메뉴판과 챗봇 답변에 바로 반영돼요. NFC 태그는 다시 만들 필요가 없어요.' }),
+    rows,
+    h('div', { style:'margin-top:32px' }, h('button', { class:'danger-link', onclick:() => {
+      if (!confirm('메뉴와 주문 내역을 처음 상태로 되돌릴까요?')) return;
+      local.del(KEY.menu); local.del(KEY.orders); local.del(KEY.seq); menus = loadMenus(); route(true); toast('시연 데이터를 초기화했어요.');
+    } }, '시연 데이터 초기화')));
+}
+function editMenu(id) {
+  const m = id ? getMenu(id) : { id:'m' + Date.now(), name:'', category:CATEGORIES[0], price:0, desc:'', caffeine:false, popular:false, soldOut:false, allergens:null, aliases:[] };
+  const picked = new Set(m.allergens || []);
+  const f = {
+    name: h('input', { value:m.name, required:true, maxlength:'30' }),
+    category: h('select', null, CATEGORIES.map(c => h('option', { value:c, selected:c === m.category }, c))),
+    price: h('input', { type:'number', inputmode:'numeric', min:'0', step:'100', value:m.price }),
+    desc: h('textarea', { maxlength:'120' }, m.desc),
+    caffeine: h('input', { type:'checkbox', checked:!!m.caffeine }),
+    popular: h('input', { type:'checkbox', checked:!!m.popular }),
+    none: h('input', { type:'checkbox', checked:Array.isArray(m.allergens) && !m.allergens.length })
+  };
+  const picks = h('div', { class:'picks', role:'group', 'aria-label':'알레르기 유발 성분' }, ALLERGENS.map(a => {
+    const b = h('button', { type:'button', class:'pick', 'aria-pressed':String(picked.has(a)) }, a);
+    b.addEventListener('click', () => { picked.has(a) ? picked.delete(a) : picked.add(a); b.setAttribute('aria-pressed', String(picked.has(a))); if (picked.size) f.none.checked = false; });
+    return b;
+  }));
+  f.none.addEventListener('change', () => { if (f.none.checked) { picked.clear(); picks.querySelectorAll('.pick').forEach(b => b.setAttribute('aria-pressed', 'false')); } });
+  const save = () => {
+    const name = f.name.value.trim(); const price = Math.round(Number(f.price.value));
+    if (!name) { toast('메뉴 이름을 입력해 주세요.'); f.name.focus(); return; }
+    if (!Number.isFinite(price) || price < 0) { toast('가격을 확인해 주세요.'); f.price.focus(); return; }
+    Object.assign(m, { name, category:f.category.value, price, desc:f.desc.value.trim(), caffeine:f.caffeine.checked, popular:f.popular.checked,
+      allergens: picked.size ? ALLERGENS.filter(a => picked.has(a)) : (f.none.checked ? [] : null) });
+    if (!id) menus.push(m);
+    saveMenus(); closeSheet(); route(true); toast('저장했어요. 손님 화면에 바로 반영돼요.');
+  };
+  openSheet(id ? '메뉴 수정' : '메뉴 추가',
+    h('h2', { text: id ? '메뉴 수정' : '메뉴 추가' }),
+    h('label', { class:'field' }, h('span', { text:'메뉴 이름' }), f.name),
+    h('label', { class:'field' }, h('span', { text:'분류' }), f.category),
+    h('label', { class:'field' }, h('span', { text:'가격(원)' }), f.price),
+    h('label', { class:'field' }, h('span', { text:'설명' }), f.desc),
+    h('label', { class:'check' }, f.caffeine, '카페인이 들어 있어요'),
+    h('label', { class:'check' }, f.popular, '인기 메뉴로 표시'),
+    h('div', { class:'field' }, h('span', { text:'알레르기 유발 성분' }), picks,
+      h('label', { class:'check' }, f.none, '확인 결과 알레르기 유발 성분 없음'),
+      h('p', { class:'hint', text:'아무것도 고르지 않으면 "미등록"으로 저장되고, 챗봇은 직원 확인을 안내해요.' })),
+    h('div', { class:'sheet-foot' },
+      h('button', { class:'btn btn-primary', onclick:save }, '저장'),
+      id ? h('button', { class:'danger-link', onclick:() => { if (!confirm(`${josa(m.name, '을', '를')} 삭제할까요?`)) return;
+        menus = menus.filter(x => x.id !== id); saveMenus(); closeSheet(); route(true); toast('삭제했어요.'); } }, '메뉴 삭제') : null));
+}
+
+/* ---------- 다른 탭의 변경 반영 (손님 ↔ 관리자 실시간 시연) ---------- */
+window.addEventListener('storage', e => {
+  if (e.key === KEY.menu) { menus = loadMenus(); if (!$('#sheetRoot').children.length) route(true); }
+  if (e.key === KEY.orders) {
+    const r = currentRoute();
+    if (r === 'order') {
+      const before = route.lastStatus; route(true);
+      const o = myLatestOrder();
+      if (o && before && before !== o.status) speak(o.status === 'preparing' ? '메뉴를 준비하고 있어요.' : o.status === 'done' ? '준비가 끝났어요. 곧 자리로 가져다 드릴게요.' : '');
+    } else if (r === 'admin' || r === 'menu') { if (!$('#sheetRoot').children.length) route(true); }
+  }
+  route.lastStatus = myLatestOrder()?.status;
+});
+
+/* ---------- 시작 ---------- */
+document.documentElement.classList.toggle('large', !!prefs.large);
+route.lastStatus = myLatestOrder()?.status;
+route();
+</script>
+</body>
+</html>
